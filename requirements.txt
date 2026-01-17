@@ -3,3 +3,4 @@ requests
 pydub
 python-dotenv
 gunicorn
+pyaudioop
