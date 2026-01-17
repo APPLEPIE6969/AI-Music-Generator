@@ -86,12 +86,12 @@ def generate_music():
         for index, api_key in enumerate(STABILITY_POOL):
             print(f"🔄 [Pool] Trying Key #{index+1}...")
             try:
-                api_url = "https://api.stability.ai/v2beta/audio/stable-audio-2/text-to-audio"
+                api_url = "https://api.stability.ai/v2beta/audio/stable-audio-2.5/text-to-audio"
                 headers = {"Authorization": f"Bearer {api_key}", "Accept": "audio/*"}
                 
                 body = {
                     "prompt": prompt, 
-                    "model": "stable-audio-2", 
+                    "model": "stable-audio-2.5", 
                     "output_format": output_format
                 }
                 files = {"none": ""} 
