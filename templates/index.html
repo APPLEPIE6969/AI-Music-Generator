@@ -1,39 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Music Gen</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-center p-4">
-    <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h1 class="text-2xl font-bold mb-4 text-blue-400">🎵 AI Music Generator</h1>
-        
-        <label class="block mb-2 text-sm">Model</label>
-        <select id="modelSelect" class="w-full bg-gray-700 p-2 rounded mb-4 border border-gray-600">
-            <option value="musicgen">MusicGen (Meta)</option>
-            <option value="riffusion">Riffusion</option>
-        </select>
-
-        <label class="block mb-2 text-sm">Prompt</label>
-        <textarea id="promptInput" class="w-full bg-gray-700 p-2 rounded mb-4 border border-gray-600" placeholder="lofi hip hop beat..."></textarea>
-
-        <label class="block mb-2 text-sm">Format</label>
-        <select id="formatSelect" class="w-full bg-gray-700 p-2 rounded mb-6 border border-gray-600">
-            <option value="mp3">MP3</option>
-            <option value="wav">WAV</option>
-        </select>
-
-        <button id="generateBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded">Generate</button>
-        
-        <p id="status" class="mt-4 text-center text-sm text-gray-400"></p>
-        
-        <div id="result" class="hidden mt-4 text-center">
-            <audio id="player" controls class="w-full mb-2"></audio>
-            <a id="download" class="text-green-400 hover:underline">Download</a>
-        </div>
-    </div>
-    <script src="/static/script.js"></script>
-</body>
-</html>
+<select id="modelSelect" class="w-full bg-gray-700 p-2 rounded mb-4 border border-gray-600 focus:outline-none focus:border-blue-500">
+    <option value="musicgen">MusicGen (Meta) - Free</option>
+    <option value="riffusion">Riffusion - Free</option>
+    <option value="stable-audio">✨ Stable Audio 2.0 (High Quality)</option>
+</select>
