@@ -1,4 +1,5 @@
 .env
+api_keys.json
 __pycache__/
 *.pyc
 ffmpeg_bin/
