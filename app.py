@@ -23,6 +23,7 @@ for i in range(1, 101):
 
 print(f"✅ Server Ready: Loaded {len(STABILITY_POOL)} pool keys.")
 
+# --- FIXED HUGGING FACE URLS ---
 HF_MODELS = {
     "musicgen": "https://router.huggingface.co/models/facebook/musicgen-small",
     "riffusion": "https://router.huggingface.co/models/riffusion/riffusion-model-v1",
@@ -53,7 +54,13 @@ def generate_music():
         try:
             api_url = "https://api.stability.ai/v2beta/audio/stable-audio-2/text-to-audio"
             headers = {"Authorization": f"Bearer {STABILITY_MASTER}", "Accept": "audio/*"}
-            body = {"prompt": prompt, "model": "stable-audio-2.0", "output_format": output_format}
+            
+            # Using valid model name 'stable-audio-2'
+            body = {
+                "prompt": prompt, 
+                "model": "stable-audio-2", 
+                "output_format": output_format
+            }
             files = {"none": ""} 
 
             response = requests.post(api_url, headers=headers, data=body, files=files)
@@ -81,7 +88,12 @@ def generate_music():
             try:
                 api_url = "https://api.stability.ai/v2beta/audio/stable-audio-2/text-to-audio"
                 headers = {"Authorization": f"Bearer {api_key}", "Accept": "audio/*"}
-                body = {"prompt": prompt, "model": "stable-audio-2.0", "output_format": output_format}
+                
+                body = {
+                    "prompt": prompt, 
+                    "model": "stable-audio-2", 
+                    "output_format": output_format
+                }
                 files = {"none": ""} 
 
                 response = requests.post(api_url, headers=headers, data=body, files=files)
