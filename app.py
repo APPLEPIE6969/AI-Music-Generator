@@ -24,8 +24,8 @@ for i in range(1, 101):
 print(f"✅ Server Ready: Loaded {len(STABILITY_POOL)} pool keys.")
 
 HF_MODELS = {
-    "musicgen": "https://api-inference.huggingface.co/models/facebook/musicgen-small",
-    "riffusion": "https://api-inference.huggingface.co/models/riffusion/riffusion-model-v1",
+    "musicgen": "https://router.huggingface.co/models/facebook/musicgen-small",
+    "riffusion": "https://router.huggingface.co/models/riffusion/riffusion-model-v1",
 }
 
 @app.route('/')
