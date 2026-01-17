@@ -3,82 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Music Generator Hub</title>
-    <!-- Tailwind CSS for styling -->
+    <title>AI Music Gen</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Custom Spinner */
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3b82f6;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    </style>
 </head>
-<body class="bg-slate-900 text-white min-h-screen flex flex-col items-center py-10">
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-center p-4">
+    <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h1 class="text-2xl font-bold mb-4 text-blue-400">🎵 AI Music Generator</h1>
+        
+        <label class="block mb-2 text-sm">Model</label>
+        <select id="modelSelect" class="w-full bg-gray-700 p-2 rounded mb-4 border border-gray-600">
+            <option value="musicgen">MusicGen (Meta)</option>
+            <option value="riffusion">Riffusion</option>
+        </select>
 
-    <div class="w-full max-w-2xl bg-slate-800 p-8 rounded-xl shadow-2xl">
-        <h1 class="text-3xl font-bold mb-2 text-blue-400">🎵 AI Music Generator</h1>
-        <p class="text-slate-400 mb-6">Create music using the best open & free models.</p>
+        <label class="block mb-2 text-sm">Prompt</label>
+        <textarea id="promptInput" class="w-full bg-gray-700 p-2 rounded mb-4 border border-gray-600" placeholder="lofi hip hop beat..."></textarea>
 
-        <!-- INPUTS -->
-        <div class="space-y-4">
-            
-            <!-- Model Selection -->
-            <div>
-                <label class="block text-sm font-medium mb-1">Choose Model</label>
-                <select id="modelSelect" class="w-full bg-slate-700 border border-slate-600 rounded p-2 focus:outline-none focus:border-blue-500">
-                    <option value="musicgen">MusicGen (Meta) - Recommended</option>
-                    <option value="riffusion">Riffusion (Open Source)</option>
-                    <option value="suno">Suno v4.5 (Requires API Key)</option>
-                    <option value="udio">Udio Beta (Requires API Key)</option>
-                    <option value="ace-step">ACE-Step (Experimental)</option>
-                    <option value="yue">YuE (Local Host Only)</option>
-                </select>
-            </div>
+        <label class="block mb-2 text-sm">Format</label>
+        <select id="formatSelect" class="w-full bg-gray-700 p-2 rounded mb-6 border border-gray-600">
+            <option value="mp3">MP3</option>
+            <option value="wav">WAV</option>
+        </select>
 
-            <!-- Prompt -->
-            <div>
-                <label class="block text-sm font-medium mb-1">Describe your song</label>
-                <textarea id="promptInput" rows="3" class="w-full bg-slate-700 border border-slate-600 rounded p-2 focus:outline-none focus:border-blue-500" placeholder="A lo-fi hip hop beat with jazz piano and rain sounds..."></textarea>
-            </div>
-
-            <!-- Format Selection -->
-            <div>
-                <label class="block text-sm font-medium mb-1">Output Format</label>
-                <select id="formatSelect" class="w-full bg-slate-700 border border-slate-600 rounded p-2">
-                    <option value="mp3">MP3 (Universal)</option>
-                    <option value="wav">WAV (High Quality)</option>
-                    <option value="flac">FLAC (Lossless)</option>
-                    <option value="m4a">M4A (Apple/Mobile)</option>
-                </select>
-            </div>
-
-            <!-- Generate Button -->
-            <button id="generateBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded transition flex justify-center items-center gap-2">
-                <span>Generate Music</span>
-            </button>
+        <button id="generateBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded">Generate</button>
+        
+        <p id="status" class="mt-4 text-center text-sm text-gray-400"></p>
+        
+        <div id="result" class="hidden mt-4 text-center">
+            <audio id="player" controls class="w-full mb-2"></audio>
+            <a id="download" class="text-green-400 hover:underline">Download</a>
         </div>
-
-        <!-- STATUS / ERROR MESSAGES -->
-        <div id="statusMessage" class="mt-4 text-center text-sm hidden"></div>
-
-        <!-- PLAYER & DOWNLOAD -->
-        <div id="resultArea" class="mt-8 hidden p-4 bg-slate-700 rounded-lg border border-slate-600">
-            <h3 class="text-lg font-semibold mb-2">Generated Track</h3>
-            <audio id="audioPlayer" controls class="w-full mb-4"></audio>
-            <a id="downloadLink" href="#" class="block w-full text-center bg-green-600 hover:bg-green-700 text-white py-2 rounded">
-                Download Audio
-            </a>
-        </div>
-
     </div>
-
-    <!-- Frontend Logic -->
     <script src="/static/script.js"></script>
 </body>
 </html>
