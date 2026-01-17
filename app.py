@@ -9,14 +9,19 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# --- CONFIGURATION ---
+# --- LOAD KEYS ---
 HF_API_TOKEN = os.getenv("HF_API_TOKEN")
 UDIO_KEY = os.getenv("UDIO_AI")
+STABILITY_MASTER = os.getenv("STABILTY_AI") # The single key
 
-# LOAD KEYS FROM ENVIRONMENT VARIABLE (Comma separated)
-# Example Env Var: "sk-123,sk-456,sk-789"
-raw_keys = os.getenv("STABILITY_KEYS_LIST", "")
-STABILITY_KEYS = [k.strip() for k in raw_keys.split(',') if k.strip()]
+# Load the Pool (STABILITY_KEY_1 to STABILITY_KEY_100)
+STABILITY_POOL = []
+for i in range(1, 101):
+    k = os.getenv(f"STABILITY_KEY_{i}")
+    if k:
+        STABILITY_POOL.append(k.strip())
+
+print(f"✅ Server Ready: Loaded {len(STABILITY_POOL)} pool keys.")
 
 HF_MODELS = {
     "musicgen": "https://api-inference.huggingface.co/models/facebook/musicgen-small",
@@ -38,57 +43,70 @@ def generate_music():
 
     audio_bytes = None
 
-    # =========================================================
-    # 1. STABILITY AI (CYCLE KEYS UNTIL ONE WORKS)
-    # =========================================================
-    if model_key == "stable-audio":
+    # ==========================================
+    # 1. STABLE AUDIO (SINGLE MASTER KEY)
+    # ==========================================
+    if model_key == "stable-audio-standard":
+        if not STABILITY_MASTER:
+            return jsonify({"error": "Master Key (STABILTY_AI) is missing."}), 500
         
-        if not STABILITY_KEYS:
-            return jsonify({"error": "Server configuration error: No Stability Keys found in settings."}), 500
+        try:
+            api_url = "https://api.stability.ai/v2beta/audio/stable-audio-2/text-to-audio"
+            headers = {"Authorization": f"Bearer {STABILITY_MASTER}", "Accept": "audio/*"}
+            body = {"prompt": prompt, "model": "stable-audio-2.0", "output_format": output_format}
+            files = {"none": ""} 
 
+            response = requests.post(api_url, headers=headers, data=body, files=files)
+            
+            if response.status_code == 200:
+                audio_bytes = response.content
+            else:
+                return jsonify({"error": f"Stability Error: {response.text}"}), response.status_code
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
+    # ==========================================
+    # 2. STABLE AUDIO (INFINITE POOL CYCLE)
+    # ==========================================
+    elif model_key == "stable-audio-infinite":
+        if not STABILITY_POOL:
+            return jsonify({"error": "No pool keys (STABILITY_KEY_1...) found."}), 500
+        
         success = False
-        last_error = ""
-        
-        print(f"🔄 Cycling through {len(STABILITY_KEYS)} keys...")
+        last_err = ""
 
-        for index, api_key in enumerate(STABILITY_KEYS):
+        # Loop through keys until one works
+        for index, api_key in enumerate(STABILITY_POOL):
+            print(f"🔄 [Pool] Trying Key #{index+1}...")
             try:
                 api_url = "https://api.stability.ai/v2beta/audio/stable-audio-2/text-to-audio"
                 headers = {"Authorization": f"Bearer {api_key}", "Accept": "audio/*"}
-                
-                body_data = {
-                    "prompt": prompt, 
-                    "model": "stable-audio-2.0", 
-                    "output_format": output_format, 
-                    "duration": 40
-                }
+                body = {"prompt": prompt, "model": "stable-audio-2.0", "output_format": output_format}
                 files = {"none": ""} 
 
-                response = requests.post(api_url, headers=headers, data=body_data, files=files)
-
+                response = requests.post(api_url, headers=headers, data=body, files=files)
+                
                 if response.status_code == 200:
-                    print(f"✅ SUCCESS on Key #{index+1}")
+                    print(f"✅ Success on Key #{index+1}")
                     audio_bytes = response.content
                     success = True
-                    break # STOP LOOP
+                    break
                 else:
-                    print(f"❌ Key #{index+1} Failed ({response.status_code}). Next...")
-                    last_error = response.text
-
+                    print(f"❌ Key #{index+1} Failed: {response.status_code}")
+                    last_err = response.text
             except Exception as e:
-                print(f"⚠️ Key #{index+1} Error: {str(e)}")
-                last_error = str(e)
-                continue 
+                print(f"⚠️ Key #{index+1} Error: {e}")
+                last_err = str(e)
+                continue
         
         if not success:
-            return jsonify({"error": f"All keys failed. Last error: {last_error}"}), 500
+            return jsonify({"error": f"All {len(STABILITY_POOL)} keys failed. Last: {last_err}"}), 500
 
     # ==========================================
-    # 2. UDIO AI
+    # 3. UDIO AI
     # ==========================================
     elif model_key == "udio":
         if not UDIO_KEY: return jsonify({"error": "Udio Key missing"}), 500
-        
         try:
             api_url = "https://api.udio.com/v1/generate" 
             headers = {"Authorization": f"Bearer {UDIO_KEY}", "Content-Type": "application/json"}
@@ -107,7 +125,7 @@ def generate_music():
             return jsonify({"error": str(e)}), 500
 
     # ==========================================
-    # 3. OPEN SOURCE (MusicGen)
+    # 4 & 5. HUGGINGFACE (MusicGen / Riffusion)
     # ==========================================
     elif model_key in HF_MODELS:
         try:
@@ -120,7 +138,7 @@ def generate_music():
             return jsonify({"error": str(e)}), 500
 
     else:
-        return jsonify({"error": "Invalid Model"}), 400
+        return jsonify({"error": "Invalid Model Selection"}), 400
 
     # ==========================================
     # OUTPUT PROCESSING
@@ -136,7 +154,7 @@ def generate_music():
         m = "audio/mp4" if output_format == "m4a" else f"audio/{output_format}"
         return send_file(buf, mimetype=m, as_attachment=True, download_name=f"generated.{output_format}")
     except Exception as e:
-        return jsonify({"error": f"FFmpeg Error: {str(e)}"}), 500
+        return jsonify({"error": f"Processing Error: {str(e)}"}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
